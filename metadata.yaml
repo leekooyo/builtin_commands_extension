@@ -3,3 +3,4 @@ display_name: Builtin Commands Extension
 desc: An official extension that provides a set of built-in commands for AstrBot, including administrator management, conversation management, LLM model management, and more.
 version: v0.1.0
 author: AstrBot
+repo: https://github.com/leekooyo/builtin_commands_extension

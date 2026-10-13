@@ -95,9 +95,9 @@ class Main(star.Star):
         await self.conversation_c.his(message, page)
 
     @filter.command("ls")
-    async def convs(self, message: AstrMessageEvent, page: int = 1) -> None:
+    async def convs(self, message: AstrMessageEvent) -> None:
         """查看对话列表"""
-        await self.conversation_c.convs(message, page)
+        await self.conversation_c.convs(message)
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("groupnew")

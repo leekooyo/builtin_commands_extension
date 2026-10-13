@@ -10,6 +10,8 @@
 - `/new`
 - `/dashboard_update`
 - `/help`
+- `/name`、`/stats`、`/provider`
+- `/set <key> <value>`、`/unset <key>`（会话变量）
 
 ## 提供的指令
 
@@ -27,8 +29,6 @@
 - `/rename`：重命名当前对话
 - `/del`：删除当前对话
 - `/persona`：查看或切换 Persona
-- `/set`：设置会话变量
-- `/unset`：移除会话变量
 
 ## 说明
 

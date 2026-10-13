@@ -80,7 +80,7 @@ class ConversationCommands:
 
         message.set_result(MessageEventResult().message(ret).use_t2i(False))
 
-    async def convs(self, message: AstrMessageEvent, page: int = 1) -> None:
+    async def convs(self, message: AstrMessageEvent) -> None:
         """查看对话列表"""
         cfg = self.context.get_config(umo=message.unified_msg_origin)
         agent_runner_type = cfg.get("agent_runner", {}).get("runner_type")
@@ -94,23 +94,14 @@ class ConversationCommands:
             )
             return
 
-        size_per_page = 6
-        """获取所有对话列表"""
         conversations_all = await self.context.conversation_manager.get_conversations(
             message.unified_msg_origin,
         )
-        """计算总页数"""
-        total_pages = (len(conversations_all) + size_per_page - 1) // size_per_page
-        """确保页码有效"""
-        page = max(1, min(page, total_pages))
-        """分页处理"""
-        start_idx = (page - 1) * size_per_page
-        end_idx = start_idx + size_per_page
-        conversations_paged = conversations_all[start_idx:end_idx]
-
-        parts = ["对话列表：\n---\n"]
-        """全局序号从当前页的第一个开始"""
-        global_index = start_idx + 1
+        if not conversations_all:
+            message.set_result(MessageEventResult().message("暂无对话。发送 /new 创建一个对话。").use_t2i(False))
+            return
+        parts = [f"对话列表 · 共 {len(conversations_all)} 个：\n---\n"]
+        global_index = 1
 
         """生成所有对话的标题字典"""
         _titles = {}
@@ -118,10 +109,9 @@ class ConversationCommands:
             title = conv.title if conv.title else "新对话"
             _titles[conv.cid] = title
 
-        """遍历分页后的对话生成列表显示"""
         provider_settings = cfg.get("provider_settings", {})
         platform_name = message.get_platform_name()
-        for conv in conversations_paged:
+        for conv in conversations_all:
             (
                 persona_id,
                 _,
@@ -168,10 +158,9 @@ class ConversationCommands:
         else:
             ret += "\n会话隔离粒度: 群聊"
 
-        ret += f"\n第 {page} 页 | 共 {total_pages} 页"
-        ret += "\n*输入 /ls 2 跳转到第 2 页"
+        ret += "\n切换：/switch <序号>；创建：/new"
 
-        message.set_result(MessageEventResult().message(ret).use_t2i(False))
+        message.set_result(MessageEventResult().message(ret).use_t2i(True))
         return
 
     async def groupnew_conv(self, message: AstrMessageEvent, sid: str = "") -> None:

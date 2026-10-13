@@ -200,12 +200,12 @@ class PersonaCommands:
                 force_warn_msg = ""
                 if force_applied_persona_id:
                     force_warn_msg = (
-                        "提醒：由于自定义规则，您现在切换的人格将不会生效。"
+                        f"已保存人格选择「{ps}」，但当前被自定义规则覆盖，未生效。\n请在配置面板检查人格规则；/reset 不会解除规则覆盖。"
                     )
 
                 message.set_result(
                     MessageEventResult().message(
-                        f"设置成功。如果您正在切换到不同的人格，请注意使用 /reset 来清空上下文，防止原人格对话影响现人格。{force_warn_msg}",
+                        force_warn_msg or f"已将当前对话的人格设为「{ps}」。\n如需从新上下文开始，发送 /reset 创建新对话，保留旧记录。",
                     ),
                 )
             else:

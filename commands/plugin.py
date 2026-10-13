@@ -25,7 +25,7 @@ class PluginCommands:
         else:
             plugin_list_info = "".join(parts)
 
-        plugin_list_info += "\n使用 /plugin help <插件名> 查看插件帮助和加载的指令。\n使用 /plugin on/off <插件名> 启用或者禁用插件。"
+        plugin_list_info += "\n使用 /plugin help <插件名> 查看插件帮助和加载的指令。\n启用：/plugin on <插件名>（机器人管理员）\n禁用：/plugin off <插件名>（机器人管理员）"
         event.set_result(
             MessageEventResult().message(f"{plugin_list_info}").use_t2i(False),
         )
@@ -94,25 +94,27 @@ class PluginCommands:
         command_names = []
         for handler in star_handlers_registry:
             assert isinstance(handler, StarHandlerMetadata)
+            if not handler.enabled:
+                continue
             if handler.handler_module_path != plugin.module_path:
                 continue
             for filter_ in handler.event_filters:
                 if isinstance(filter_, CommandFilter):
                     command_handlers.append(handler)
-                    command_names.append(filter_.command_name)
+                    command_names.append(filter_.get_complete_command_names()[0])
                     break
                 if isinstance(filter_, CommandGroupFilter):
                     command_handlers.append(handler)
-                    command_names.append(filter_.group_name)
+                    command_names.append(filter_.get_complete_command_names()[0])
 
         if len(command_handlers) > 0:
             parts = ["\n\n🔧 指令列表：\n"]
             for i in range(len(command_handlers)):
-                line = f"- {command_names[i]}"
+                line = f"- /{command_names[i]}"
                 if command_handlers[i].desc:
                     line += f": {command_handlers[i].desc}"
                 parts.append(line + "\n")
-            parts.append("\nTip: 指令的触发需要添加唤醒前缀，默认为 /。")
+            parts.append("\n以上以 / 为唤醒前缀示例，按你的实际配置使用。")
             help_msg += "".join(parts)
 
         ret = f"🧩 插件 {plugin_name} 帮助信息：\n" + help_msg
