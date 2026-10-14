@@ -2,6 +2,10 @@
 
 这是 AstrBot 的内置指令扩展插件。
 
+## 安装此维护版
+
+在 AstrBot 中选择「通过仓库地址安装」，填写 `https://github.com/leekooyo/builtin_commands_extension`。本仓库基于 [AstrBotDevs 原项目](https://github.com/AstrBotDevs/builtin_commands_extension) 独立维护，维护差异见 [UPSTREAM.md](UPSTREAM.md)。本插件没有独立配置界面；管理员授权、会话和模型配置由 AstrBot 本机保存，不应加入 Git 仓库。
+
 从 AstrBot `builtin_commands` 中迁出的非核心指令会放在这里维护。核心内置指令仍保留在 AstrBot 主程序中，包括：
 
 - `/sid`
