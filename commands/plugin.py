@@ -13,11 +13,16 @@ class PluginCommands:
 
     async def plugin_ls(self, event: AstrMessageEvent) -> None:
         """获取已经安装的插件列表。"""
-        parts = ["已加载的插件：\n"]
+        local_help = self.context.get_registered_star("astrbot_plugin_local_help")
+        helper = getattr(local_help, "star_cls", None)
+        labels = ({item["name"]: item["label"] for item in helper._catalog()}
+                  if getattr(local_help, "activated", False) and helper else {})
+        parts = ["已安装插件：\n"]
         for plugin in self.context.get_all_stars():
-            line = f"- `{plugin.name}` By {plugin.author}: {plugin.desc}"
+            label = labels.get(plugin.name, getattr(plugin, "display_name", "") or plugin.name)
+            line = f"- {label}（标识：{plugin.name}）"
             if not plugin.activated:
-                line += " (未启用)"
+                line += " · 已停用"
             parts.append(line + "\n")
 
         if len(parts) == 1:
@@ -25,7 +30,7 @@ class PluginCommands:
         else:
             plugin_list_info = "".join(parts)
 
-        plugin_list_info += "\n使用 /plugin help <插件名> 查看插件帮助和加载的指令。\n启用：/plugin on <插件名>（机器人管理员）\n禁用：/plugin off <插件名>（机器人管理员）"
+        plugin_list_info += "\n查看用法：/help 插件名\n管理员启用：/plugin on <插件标识>\n管理员停用：/plugin off <插件标识>"
         event.set_result(
             MessageEventResult().message(f"{plugin_list_info}").use_t2i(False),
         )
@@ -83,6 +88,11 @@ class PluginCommands:
             event.set_result(
                 MessageEventResult().message("/plugin help <插件名> 查看插件信息。"),
             )
+            return
+        local_help = self.context.get_registered_star("astrbot_plugin_local_help")
+        helper = getattr(local_help, "star_cls", None)
+        if getattr(local_help, "activated", False) and helper is not None:
+            event.set_result(await helper.plugin_detail_image(event, plugin_name))
             return
         plugin = self.context.get_registered_star(plugin_name)
         if plugin is None:
